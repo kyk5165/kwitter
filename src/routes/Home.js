@@ -1,43 +1,35 @@
 import { dbService } from "fbase";
 import React, { useEffect, useState } from "react";
+import Kweet from "components/Kweet";
+import KweetFactory from "components/KweetFactory";
 
-const Home = ({userObj}) => {
-    const [kweet, setKweet] = useState("");
-    const [kweets, setKweets] = useState([]);
-    const onSubmit = async (event) => {
-        event.preventDefault();
-        await dbService.collection("kweets").add({
-            text:kweet,
-            createAt: Date.now(),
-            creatorId: userObj.uid
-        });
-        setKweet("");
-    };
-    const onChange = (event) => {
-        const {
-            target: {value}
-        } = event;
-        setKweet(value);
-    };
-    useEffect(()=>{
-        dbService.collection("kweets").onSnapshot((snapshot) =>{
-            const kweetArray = snapshot.docs.map(doc => ({id:doc.id, ...doc.data()}));
-            setKweets(kweetArray);
-        });
-    },[]);
-    return (
+const Home = ({ userObj }) => {
+  const [kweets, setKweets] = useState([]);
+  useEffect(() => {
+    dbService
+      .collection("kweets")
+      .orderBy("createdAt", "desc")
+      .onSnapshot((snapshot) => {
+        const kweetArray = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setKweets(kweetArray);
+      });
+  }, []);
+  return (
     <div>
-        <form onSubmit={onSubmit}>
-            <input type="text" placeholder="What's on your mind?" value={kweet} maxLength={120} onChange={onChange} />
-            <input type="submit" value="Kweet" />
-        </form>
-        <div>
-            {kweets.map((kweet) => (
-                <div key={kweet.id}>
-                    <h4>{kweet.text}</h4>
-                </div>
-            ))}
-        </div>
+      <KweetFactory userObj={userObj} />
+      <div>
+        {kweets.map((kweet) => (
+          <Kweet
+            key={kweet.id}
+            kweetObj={kweet}
+            isOwner={kweet.creatorId === userObj.uid}
+          />
+        ))}
+      </div>
     </div>
-)};
+  );
+};
 export default Home;
