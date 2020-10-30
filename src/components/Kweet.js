@@ -1,3 +1,5 @@
+import { faPencilAlt, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { dbService, storageService } from "fbase";
 import React, { useState } from "react";
 
@@ -26,40 +28,41 @@ const Kweet = ({ kweetObj, isOwner }) => {
     setNewKweet(value);
   };
   return (
-    <div>
+    <div className="kweet">
       {editing ? (
         <>
           {isOwner && (
             <>
-              <form onSubmit={onSubmit}>
+              <form onSubmit={onSubmit} className="container kweetEdit">
                 <input
                   type="text"
                   value={newKweet}
                   required
                   onChange={onChange}
+                  autoFocus
+                  className="formInput"
                 />
-                <input type="submit" value="Updata Kweet" />
+                <input type="submit" value="Updata Kweet" className="formBtn" />
               </form>
-              <button onClick={toggleEditing}>Cancel</button>
+              <span onClick={toggleEditing} className="formBtn cancelBtn">
+                Cancel
+              </span>
             </>
           )}
         </>
       ) : (
         <>
           <h4>{kweetObj.text}</h4>
-          {kweetObj.attachmentUrl && (
-            <img
-              src={kweetObj.attachmentUrl}
-              width="50px"
-              height="50px"
-              alt="img"
-            />
-          )}
+          {kweetObj.attachmentUrl && <img src={kweetObj.attachmentUrl} />}
           {isOwner && (
-            <>
-              <button onClick={onDeleteClick}>Del</button>
-              <button onClick={toggleEditing}>Edit</button>
-            </>
+            <div class="nweet__actions">
+              <span onClick={onDeleteClick}>
+                <FontAwesomeIcon icon={faTrash} />
+              </span>
+              <span onClick={toggleEditing}>
+                <FontAwesomeIcon icon={faPencilAlt} />
+              </span>
+            </div>
           )}
         </>
       )}
